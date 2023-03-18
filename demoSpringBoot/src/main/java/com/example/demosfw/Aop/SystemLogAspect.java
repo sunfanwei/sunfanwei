@@ -1,5 +1,6 @@
-package com.example.demosfw;
+package com.example.demosfw.Aop;
 
+import com.example.demosfw.Thead.CrmLogMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -33,7 +34,7 @@ public class SystemLogAspect {
      * 指向你的切面类方法
      * 由于这里使用了自定义注解所以指向你的自定义注解
      */
-    @Pointcut("@annotation(com.example.demosfw.SystemCrmlog)")
+    @Pointcut("@annotation(com.example.demosfw.Aop.SystemCrmlog)")
     public void crmAspect() {
     }
 
