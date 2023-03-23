@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600)
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
