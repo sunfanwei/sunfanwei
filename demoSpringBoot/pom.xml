@@ -146,6 +146,12 @@
 			<version>2.0.25</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-assembly-plugin</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 
 
 	</dependencies>
@@ -154,129 +160,43 @@
 
 
 	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-				</includes>
-				<!-- 排除外置的配置文件（运行时注释上，使IDE能读到配置文件；打包时放开注释让配置文件外置，方便修改）可以不配置，maven-jar-plugin下面已配置 -->
-				<!--<excludes>
-                    <exclude>config.properties</exclude>
-                </excludes>-->
-			</resource>
-			<!-- 配置文件外置的资源（存放到conf目录，也是classpath路径，下面会配置）-->
-			<!--<resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>config.properties</include>
-                </includes>
-                <targetPath>${project.build.directory}/conf</targetPath>
-            </resource>-->
-		</resources>
-
 		<plugins>
-			<!--java编译打包插件-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!--
-                ③打成一个zip包，发布项目的时候，将zip包copy到服务器上，直接unzip xxx.zip，里面包含要运行到的jar以及依赖的lib，还有配置的config文件，即可直接启动服务
-            -->
-
-			<!--The configuration of maven-jar-plugin-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
-				<!--The configuration of the plugin-->
 				<configuration>
-					<!-- 不打包资源文件（配置文件和依赖包分开） -->
-					<excludes>
-						<exclude>*.properties</exclude>
-						<exclude>*.xml</exclude>
-						<exclude>*.txt</exclude>
+					<excludes>--排除classpath下文件
+						<exclude>**/*.properties</exclude>
+						<exclude>**/*.xml</exclude>
+						<exclude>META-INF/**/*</exclude>
 					</excludes>
-					<!--Configuration of the archiver-->
-					<archive>
-						<!--生成的jar中，不要包含pom.xml和pom.properties这两个文件-->
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<!--Manifest specific configuration-->
-						<manifest>
-							<!--是否把第三方jar放到manifest的classpath中-->
-							<addClasspath>true</addClasspath>
-							<!--生成的manifest中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前缀是lib/-->
-							<classpathPrefix>lib/</classpathPrefix>
-							<!--应用的main class-->
-							<mainClass>com.example.demosfw.DemoSfwApplication</mainClass>
-						</manifest>
-						<!-- 给清单文件添加键值对，增加classpath路径，这里将conf目录也设置为classpath路径 -->
-						<manifestEntries>
-							<Class-Path>conf/</Class-Path>
-						</manifestEntries>
-					</archive>
-					<!--过滤掉不希望包含在jar中的文件-->
-					<!-- <excludes>
-                         <exclude>${project.basedir}/xml/*</exclude>
-                     </excludes>-->
 				</configuration>
 			</plugin>
 
-			<!--The configuration of maven-assembly-plugin-->
-			<!--<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+
+			<!-- 打tar.gz包 -->
+			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				&lt;!&ndash;The configuration of the plugin&ndash;&gt;
-				<configuration>
-					&lt;!&ndash;Specifies the configuration file of the assembly plugin&ndash;&gt;
-					<descriptors>
-						<descriptor>src/main/assembly/assembly.xml</descriptor>
-					</descriptors>
-				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id>
+						<id>make-targz</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/../release/tar.gz</outputDirectory>
+						</configuration>
 					</execution>
 				</executions>
-			</plugin>-->
-
-			<!--<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.7.5</version>
 				<configuration>
-
-					<fork>false</fork>
-
-					&lt;!&ndash; spring-boot:run 中文乱码解决 &ndash;&gt;
-					<jvmArguments>-Dfile.encoding=GB2312</jvmArguments>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>${basedir}/src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
 				</configuration>
-			</plugin>-->
+			</plugin>
 		</plugins>
 	</build>
 
